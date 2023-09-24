@@ -24,6 +24,7 @@ async function run() {
     try {
         const menuCollection = client.db('spicyRestaurant').collection('menu');
         const reviewCollection = client.db('spicyRestaurant').collection('reviews');
+        const cartCollection = client.db('spicyRestaurant').collection('carts');
 
         app.get('/menu', async (req, res) => {
             const result = await menuCollection.find().toArray();
@@ -31,6 +32,23 @@ async function run() {
         })
         app.get('/reviews', async (req, res) => {
             const result = await reviewCollection.find().toArray();
+            res.send(result)
+        });
+
+        //cart collection 
+        app.get('/carts', async (req, res) => {
+            const email = req.query.email;
+            if (!email) {
+                res.send([])
+            }
+            const query = { email: email };
+            const result = await cartCollection.find(query).toArray();
+            res.send(result)
+        });
+
+        app.post('/carts', async (req, res) => {
+            const item = req.body;
+            const result = await cartCollection.insertOne(item);
             res.send(result)
         })
 
@@ -48,3 +66,15 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
 })
+
+/**
+ * ---------------------
+ *  Naming convention 
+ * ------------------------
+ * users: userCollection
+ * app.get('users) 
+ * app.get('users/:id) 
+ * app.post('users') 
+ * app.put('users/:id')
+ * app.patch('users/:id')
+ */
